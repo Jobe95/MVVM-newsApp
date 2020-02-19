@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fresh_news/pages/newsArticleDetailsPage.dart';
 import 'package:fresh_news/viewmodels/newsArticleListViewModel.dart';
+import 'package:fresh_news/viewmodels/newsArticleViewModel.dart';
 import 'package:fresh_news/widgets/newsList.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +20,17 @@ class _NewsListPageState extends State<NewsListPage> {
         .populateTopHeadlines();
   }
 
-  Widget _buildList(NewsArticleListViewModel vm) {
+  void _showNewsArticleDetails(
+      BuildContext context, NewsArticleViewModel article) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NewsArticleDetailsPage(article: article),
+      ),
+    );
+  }
+
+  _buildList(BuildContext context, NewsArticleListViewModel vm) {
     switch (vm.loadingStatus) {
       case LoadingStatus.searching:
         return Align(
@@ -32,6 +44,9 @@ class _NewsListPageState extends State<NewsListPage> {
         return Expanded(
           child: NewsList(
             articles: vm.articles,
+            onSelected: (article) {
+              _showNewsArticleDetails(context, article);
+            },
           ),
         );
     }
@@ -65,11 +80,12 @@ class _NewsListPageState extends State<NewsListPage> {
                 icon: Icon(Icons.clear),
                 onPressed: () {
                   _controller.clear();
+                  vm.populateTopHeadlines();
                 },
               ),
             ),
           ),
-          _buildList(vm),
+          _buildList(context, vm),
         ],
       ),
     );
